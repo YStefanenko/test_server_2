@@ -1,6 +1,194 @@
 import { WebSocketServer } from "ws";
+import WebSocket from "ws";
 import fs from 'fs';
 import path from 'path';
 import dotenv from "dotenv";
+import { CONNECTED_IPS, Authorized_Players } from "./globalVariables.js";
+import send from "send";
 dotenv.config();
 
+const PORT = 1000;
+const TICK_INTERVAL = 10000;
+const thisIP = `26.51.7.254`;
+
+const CENTRAL_SERVER_URL = `ws://26.51.7.254:9056`;
+let centralWS = null;
+
+const wss = new WebSocketServer({ port: PORT });
+connectToCentralServer();
+
+console.log(`WebSocket server running on ${wss._server.address().address}:${PORT}`);
+
+wss.funcs = new Map();
+const dbFunctionsLoad = fs.readdirSync("./Functions").filter(file => file.endsWith(".js"));
+
+var funcNum = 0;
+for (const file of dbFunctionsLoad) {
+  const filePath = `./Functions/${file}`;
+  const functionModule = await import(filePath);
+  const _function = functionModule.default;
+
+  if (_function) {
+    wss.funcs.set(_function.name, {..._function, category: _function.category || "uncategorized"});
+  }
+  funcNum++;
+}
+console.log("Loaded " + funcNum + " FUNCTIONS.");
+
+wss.on("connection", (ws, request) => {
+  const ip = String(request.headers["x-forwarded-for"]?.split(",")[0] || request.socket.remoteAddress).replace("::ffff:", "");
+  if (CONNECTED_IPS.has(ip)) {
+    console.log(`Rejected duplicate connection from ${ip}`);
+    ws.close(1008, "Only one connection per IP allowed");
+    return;
+  }
+
+  CONNECTED_IPS.set(ip, {authorized: false, type: "client", username: null, email: null, primary_gameserver: null});
+
+  ws.clientIP = ip;
+  ws.type = `client`;
+  ws.isAlive = true;
+
+  console.log(`${ip} Connected`);
+
+  ws.on("pong", () => {
+    ws.isAlive = true;
+  });
+
+  ws.on("message", (data) => {
+    let msg;
+    try {
+      msg = JSON.parse(data);
+    } catch(e) {
+      return console.log(e);
+    }
+
+    handleMessage(ws, msg);
+  });
+
+  ws.on("close", (code, reason) => {
+    const ip = ws.clientIP;
+    const type = CONNECTED_IPS.get(ws.clientIP).type;
+
+    CONNECTED_IPS.delete(ip);
+
+    if (type === "gameserver") {
+      console.log(`Game Server[${ip}] disconnected with reason ${reason}[${code}]`);
+
+      GAMESERVER_IP_LIST.delete(ws.clientIP);
+    } else {
+      console.log("Client disconnected:", ip);
+
+      sendToGameServers({
+        type: "delete_authorizedip",
+        content: {
+          ip: `${ip}`
+        }
+      });
+
+    }
+  });
+});
+
+async function handleMessage(ws, msg) {
+  switch (String(msg.type).toUpperCase()) {
+    default:
+      try{
+        var func = wss.funcs.get(String(msg.type).toUpperCase());
+        await func.execute(ws, msg);
+      }catch(e){
+        console.log(e);
+        ws.send(JSON.stringify({
+          type: `${String(msg.type).toLowerCase()}`,
+          status: 0,
+          error: `request-error`
+        }));
+      }
+      break;
+  }
+
+  console.log(msg);
+}
+
+function connectToCentralServer() {
+  centralWS = new WebSocket(CENTRAL_SERVER_URL);
+
+  centralWS.on("open", () => {
+    console.log("Connected to CENTRAL server");
+
+    // identify yourself
+    sendToCentral({
+        type: `submit_gameserver`,
+        content: {ip: `${thisIP}`, port: PORT, passkey: `${process.env.CS_ACCESSKEY}`}
+      });
+  });
+
+  centralWS.on("message", (data) => {
+    let msg;
+    try {
+      msg = JSON.parse(data);
+    } catch {
+      return;
+    }
+
+    handleCentralMessage(msg);
+  });
+
+  centralWS.on("close", () => {
+    console.log("Central server connection closed. Reconnecting...");
+    setTimeout(connectToCentralServer, 5000);
+  });
+
+  centralWS.on("error", (err) => {
+    console.error("Central server error:", err.message);
+  });
+}
+
+function handleCentralMessage(msg) {
+  switch (String(msg.type).toLowerCase()) {
+    case `submit_authorizedip`:
+        Authorized_Players.set(msg.content.ip);
+        break;
+    case `delete_authorizedip`:
+        Authorized_Players.delete(msg.content.ip);
+        break;
+
+    default:
+      console.log("Central → GameServer:", msg);
+      break;
+  }
+}
+
+export function sendToCentral(payload) {
+  if (
+    centralWS &&
+    centralWS.readyState === WebSocket.OPEN
+  ) {
+    centralWS.send(JSON.stringify(payload));
+  }
+}
+
+setInterval(() => {
+  broadcastState();
+}, TICK_INTERVAL);
+
+function broadcastState() {
+  wss.clients.forEach(ws => {
+    if (ws.isAlive === false) {
+      console.log("Terminating dead connection:", ws.clientIP);
+      return ws.terminate();
+    }
+
+    ws.isAlive = false;
+    ws.ping();
+  });
+}
+
+//Handling Rejections and Exceptions
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection:', reason);
+});
+
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error);
+});
