@@ -1,4 +1,4 @@
-import { CONNECTED_IPS, Authorized_Players } from "../globalVariables";
+import { CONNECTED_IPS, Authorized_Players } from "../globalVariables.js";
 
 export default {
   name: 'SUBMIT_AUTHORIZEDIP',

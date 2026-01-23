@@ -1,5 +1,5 @@
-import { CONNECTED_IPS, Authorized_Players } from "../globalVariables";
-import { queue1v1, queuev3, queuev4, queuev34 } from "../queue";
+import { CONNECTED_IPS, Authorized_Players } from "../globalVariables.js";
+import { queue1v1, queuev3, queuev4, queuev34 } from "../queue.js";
 
 export default {
   name: 'MATCHMAKE',
