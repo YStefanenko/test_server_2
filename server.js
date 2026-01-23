@@ -3,7 +3,7 @@ import WebSocket from "ws";
 import fs from 'fs';
 import path from 'path';
 import dotenv from "dotenv";
-import { CONNECTED_IPS, Authorized_Players, Player } from "./globalVariables.js";
+import { CONNECTED_IPS, Authorized_Players } from "./globalVariables.js";
 import send from "send";
 dotenv.config();
 
