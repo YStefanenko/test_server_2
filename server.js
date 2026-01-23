@@ -5,6 +5,7 @@ import path from 'path';
 import dotenv from "dotenv";
 import { CONNECTED_IPS, Authorized_Players } from "./globalVariables.js";
 import send from "send";
+import websocketserver from "websocketserver";
 dotenv.config();
 
 const PORT = 1000;
@@ -119,7 +120,7 @@ function connectToCentralServer() {
       return;
     }
 
-    handleCentralMessage(centralWS, msg);
+    handleCentralMessage(msg);
   });
 
   centralWS.on("close", () => {
@@ -132,15 +133,17 @@ function connectToCentralServer() {
   });
 }
 
-async function handleCentralMessage(centralWS, msg) {
+async function handleCentralMessage(msg) {
+  console.log(msg);
+  if(msg.status) return;
   switch (String(msg.type).toUpperCase()) {
     default:
       try{
         var func = wss.funcs.get(String(msg.type).toUpperCase());
-        await func.execute(centralWS, msg, {sendToCentral});
+        await func.execute(msg);
       }catch(e){
         console.log(e);
-        ws.send(JSON.stringify({
+        centralWS.send(JSON.stringify({
           type: `${String(msg.type).toLowerCase()}`,
           status: 0,
           error: `request-error`
@@ -148,8 +151,6 @@ async function handleCentralMessage(centralWS, msg) {
       }
       break;
   }
-
-  console.log(msg);
 }
 
 export function sendToCentral(payload) {
