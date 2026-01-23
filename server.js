@@ -3,7 +3,7 @@ import WebSocket from "ws";
 import fs from 'fs';
 import path from 'path';
 import dotenv from "dotenv";
-import { CONNECTED_IPS, Authorized_Players } from "./globalVariables.js";
+import { CONNECTED_IPS, Authorized_Players, Player } from "./globalVariables.js";
 import send from "send";
 dotenv.config();
 
@@ -43,7 +43,7 @@ wss.on("connection", (ws, request) => {
     return;
   }
 
-  CONNECTED_IPS.set(ip, {authorized: false, type: "client", username: null, email: null, primary_gameserver: null});
+  CONNECTED_IPS.set(ip, {authorized: false, type: "client", ws: ws});
 
   ws.clientIP = ip;
   ws.type = `client`;
@@ -68,25 +68,9 @@ wss.on("connection", (ws, request) => {
 
   ws.on("close", (code, reason) => {
     const ip = ws.clientIP;
-    const type = CONNECTED_IPS.get(ws.clientIP).type;
 
     CONNECTED_IPS.delete(ip);
-
-    if (type === "gameserver") {
-      console.log(`Game Server[${ip}] disconnected with reason ${reason}[${code}]`);
-
-      GAMESERVER_IP_LIST.delete(ws.clientIP);
-    } else {
-      console.log("Client disconnected:", ip);
-
-      sendToGameServers({
-        type: "delete_authorizedip",
-        content: {
-          ip: `${ip}`
-        }
-      });
-
-    }
+    console.log("Client disconnected:", ip);
   });
 });
 
@@ -95,7 +79,7 @@ async function handleMessage(ws, msg) {
     default:
       try{
         var func = wss.funcs.get(String(msg.type).toUpperCase());
-        await func.execute(ws, msg);
+        await func.execute(ws, msg, {sendToCentral});
       }catch(e){
         console.log(e);
         ws.send(JSON.stringify({
@@ -131,7 +115,7 @@ function connectToCentralServer() {
       return;
     }
 
-    handleCentralMessage(msg);
+    handleCentralMessage(centralWS, msg);
   });
 
   centralWS.on("close", () => {
@@ -144,19 +128,24 @@ function connectToCentralServer() {
   });
 }
 
-function handleCentralMessage(msg) {
-  switch (String(msg.type).toLowerCase()) {
-    case `submit_authorizedip`:
-        Authorized_Players.set(msg.content.ip);
-        break;
-    case `delete_authorizedip`:
-        Authorized_Players.delete(msg.content.ip);
-        break;
-
+async function handleCentralMessage(centralWS, msg) {
+  switch (String(msg.type).toUpperCase()) {
     default:
-      console.log("Central → GameServer:", msg);
+      try{
+        var func = wss.funcs.get(String(msg.type).toUpperCase());
+        await func.execute(centralWS, msg, {sendToCentral});
+      }catch(e){
+        console.log(e);
+        ws.send(JSON.stringify({
+          type: `${String(msg.type).toLowerCase()}`,
+          status: 0,
+          error: `request-error`
+        }));
+      }
       break;
   }
+
+  console.log(msg);
 }
 
 export function sendToCentral(payload) {
