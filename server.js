@@ -43,7 +43,11 @@ wss.on("connection", (ws, request) => {
     return;
   }
 
-  CONNECTED_IPS.set(ip, {authorized: false, type: "client", ws: ws});
+  if(!Authorized_Players.has(ip)){
+    ws.close(401, "Unauthorized Connection");
+  }
+
+  CONNECTED_IPS.set(ip, {type: "client", ws: ws});
 
   ws.clientIP = ip;
   ws.type = `client`;

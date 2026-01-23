@@ -8,8 +8,6 @@ export default {
     const title = msg.content.title;
     const elo = msg.content.elo;
 
-    CONNECTED_IPS.get(ip).authorized = true;
-
-    Authorized_Players.set(ip, {ws: CONNECTED_IPS.get(ip).ws, username: username, title: title, elo: elo});
+    Authorized_Players.set(ip, {username: username, title: title, elo: elo});
   }
 };
