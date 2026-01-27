@@ -47,11 +47,11 @@ startMatchmaking();
 
 wss.on("connection", (ws, request) => {
   const ip = String(request.headers["x-forwarded-for"]?.split(",")[0] || request.socket.remoteAddress).replace("::ffff:", "");
-  /*if (CONNECTED_IPS.has(ip)) {
+  if (CONNECTED_IPS.has(ip)) {
     console.log(`Rejected duplicate connection from ${ip}`);
     ws.close(1008, "Only one connection per IP allowed");
     return;
-  }*/
+  }
 
   if(!Authorized_Players.has(ip)){
     ws.close(401, "Unauthorized Connection");
@@ -168,7 +168,6 @@ async function handleCentralMessage(msg) {
     default:
       try{
         var func = wss.funcs.get(String(msg.type).toUpperCase());
-        console.log(func);
         await func.execute(msg);
       }catch(e){
         console.log(e);
