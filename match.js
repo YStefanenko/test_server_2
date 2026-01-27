@@ -7,7 +7,7 @@ export class Match {
         this.id = id;
         this.mode = mode;
         this.players = players;
-        this.startPlayers = players;
+        this.startPlayers = null;
         this.activePlayers = new Map();
         this.running = false;
         this.tickRate = 997;
@@ -34,6 +34,12 @@ export class Match {
         if(this.mode === "1v1") mapNum = rand(1, 30);
         else if(this.mode === "v3") mapNum = rand(31, 33);
         else if(this.mode === "v4") mapNum = rand(37, 39);
+
+        this.startPlayers = this.players.map(p => ({
+            username: p.username,
+            elo: p.elo,
+            title: p.title ?? null
+        }));
 
         const playerNameList = [];
         for (const p of this.players) {

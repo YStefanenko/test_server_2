@@ -112,7 +112,12 @@ export class Custom_Match {
 
         this.spectators = this.players.splice(minPlayers);
 
-        this.startPlayers = this.players;
+        this.startPlayers = this.players.map(p => ({
+            username: p.username,
+            elo: p.elo,
+            title: p.title ?? null
+        }));
+        
         for (const p of this.players) {
             console.log(`Player ${p.username} is in the game.`);
         }
