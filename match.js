@@ -210,7 +210,7 @@ export class Match {
         if(this.running){
             this.messages.push(msg)
         }
-        if(msg.type === "stats"){
+        if(stats in msg){
             this.endInfo = msg;
 
             this.resolvedEndInfo = true;

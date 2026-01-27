@@ -110,9 +110,15 @@ export class Custom_Match {
         else if(this.mode === "v3") minPlayers = 3;
         else if(this.mode === "v4") minPlayers = 4;
 
-        this.spectators = this.players.splice(minPlayers-1);
+        this.spectators = this.players.splice(minPlayers);
 
         this.startPlayers = this.players;
+        for (const p of this.players) {
+            console.log(`Player ${p.username} is in the game.`);
+        }
+        for (const p of this.spectators) {
+            console.log(`Spectator ${p.username} is in the game.`);
+        }
 
         console.log(this.players + "\n" + this.spectators);
 
@@ -332,7 +338,7 @@ export class Custom_Match {
             this.messages.push(msg)
         }
         else{
-            if(msg.type === "stats"){
+            if(stats in msg){
                 this.endInfo = msg;
 
                 this.resolvedEndInfo = true;
