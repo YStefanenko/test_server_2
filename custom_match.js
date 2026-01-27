@@ -332,13 +332,13 @@ export class Custom_Match {
         if(this.running && msg.type != "start_room"){
             this.messages.push(msg)
         }
-        if(msg.type === "end_info" && !this.resolvedEndInfo){
+        if(msg.type === "stats" && !this.resolvedEndInfo){
             this.endInfo = msg;
 
             this.resolvedEndInfo = true;
         }
 
-        if(msg.type === "stats"){
+        if(msg.type === "start_room"){
             this.matchStartInfo = msg;
         }
     }
