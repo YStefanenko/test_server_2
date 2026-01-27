@@ -27,17 +27,17 @@ export function createMatch(mode, players) {
     return id;
 }
 
-export function createCustomMatch(id, mode, players, customMap = null) {
+export async function createCustomMatch(id, mode, players, customMap = null) {
     const match = new Custom_Match(id, mode, players);
     match.id = id;
     match.customMap = customMap;
 
     activeCustomMatches.set(id, match);
 
-    match.start().catch(err => {
+    match.start().catch(async err => {
         console.error("Match failed to start:", err);
         activeCustomMatches.delete(id);
-        sendToCentral({
+        await sendToCentral({
             type: `close_custom_room`,
             content:{
                 code: id
