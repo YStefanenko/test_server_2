@@ -16,7 +16,7 @@ dotenv.config();
 
 const PORT = 1000;
 const TICK_INTERVAL = 10000;
-const thisIP = `26.51.7.254`;
+const thisIP =`${process.env.this_IP}`;
 
 const CENTRAL_SERVER_URL = `${process.env.CS_IP}`;
 let centralWS = null;
