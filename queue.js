@@ -92,8 +92,8 @@ export async function matchmakingV34() {
                 playersV3.push(player);
             } catch (err) {
                 for (let i = playersV3.length - 1; i >= 0; i--) {
-                    if (players[i].ws.readyState != 1) {
-                        console.log(`${players[i].username} Removed from v3 Queue.`);
+                    if (playersV3[i].ws.readyState != 1) {
+                        console.log(`${playersV3[i].username} Removed from v3 Queue.`);
                         playersV3.splice(i, 1);
                     }
                 }
@@ -106,8 +106,8 @@ export async function matchmakingV34() {
                 playersV4.push(player);
             } catch (err) {
                 for (let i = playersV4.length - 1; i >= 0; i--) {
-                    if (players[i].ws.readyState != 1) {
-                        console.log(`${players[i].username} Removed from v4 Queue.`);
+                    if (playersV4[i].ws.readyState != 1) {
+                        console.log(`${playersV4[i].username} Removed from v4 Queue.`);
                         playersV4.splice(i, 1);
                     }
                 }
@@ -120,8 +120,8 @@ export async function matchmakingV34() {
                 playersV34.push(player);
             } catch (err) {
                 for (let i = playersV34.length - 1; i >= 0; i--) {
-                    if (players[i].ws.readyState != 1) {
-                        console.log(`${players[i].username} Removed from v34 Queue.`);
+                    if (playersV34[i].ws.readyState != 1) {
+                        console.log(`${playersV34[i].username} Removed from v34 Queue.`);
                         playersV34.splice(i, 1);
                     }
                 }
