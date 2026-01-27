@@ -179,7 +179,7 @@ async function handleCentralMessage(msg) {
 export async function sendToCentral(payload) {
   if (!centralWS || centralWS.readyState !== WebSocket.OPEN) {
     console.log("Central server not ready.");
-    return;
+    return setTimeout(() => sendToCentral(payload), 5000);
   }
 
   console.log(`SENT TO CENTRAL: ${JSON.stringify(payload)}`);
