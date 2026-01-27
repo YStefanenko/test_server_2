@@ -15,7 +15,7 @@ export class Match {
         this.peaceTick = 20;
         this.peaceOngoing = true;
         this.endInfo = null;
-        this.resolveEndInfo = null;
+        this.resolvedEndInfo = false;
     }
 
     async start() {
@@ -182,9 +182,7 @@ export class Match {
         console.log(`Ending ${this.mode} match with winner ${winner}`);
 
         if(this.endInfo === null){
-            await new Promise(resolve => {
-                this.resolveEndInfo = resolve;
-            });
+            await waitForTrue(() => this.resolvedEndInfo === true);
         }
 
         console.log(this.endInfo);
@@ -211,11 +209,10 @@ export class Match {
             this.messages.push(msg)
         }
         else{
-            if(msg.type === "end_info" && this.resolveEndInfo){
+            if(msg.type === "end_info" && !this.resolvedEndInfo){
                 this.endInfo = msg;
 
-                this.resolveEndInfo();
-                this.resolveEndInfo = null;
+                this.resolvedEndInfo = true;
             }
         }
     }
@@ -231,4 +228,15 @@ function rand(min, max) {
 
 function isConnected(player) {
     return player.ws.readyState === 1;
+}
+
+function waitForTrue(checkFn, interval = 50) {
+  return new Promise(resolve => {
+    const timer = setInterval(() => {
+      if (checkFn()) {
+        clearInterval(timer);
+        resolve();
+      }
+    }, interval);
+  });
 }

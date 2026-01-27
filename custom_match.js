@@ -17,7 +17,7 @@ export class Custom_Match {
         this.peaceTick = 20;
         this.peaceOngoing = true;
         this.endInfo = null;
-        this.resolveEndInfo = null;
+        this.resolvedEndInfo = false;
         this.matchStartInfo = null;
         this.gameReady = false;
         this.customMap = null;
@@ -294,9 +294,7 @@ export class Custom_Match {
         console.log(`Ending ${this.mode} match with winner ${winner}`);
 
         if(this.endInfo === null){
-            await new Promise(resolve => {
-                this.resolveEndInfo = resolve;
-            });
+            await waitForTrue(() => this.resolvedEndInfo === true);
         }
 
         await sendToCentral({
@@ -332,11 +330,10 @@ export class Custom_Match {
             this.messages.push(msg)
         }
         else{
-            if(msg.type === "end_info" && this.resolveEndInfo){
+            if(msg.type === "end_info" && !this.resolvedEndInfo){
                 this.endInfo = msg;
 
-                this.resolveEndInfo();
-                this.resolveEndInfo = null;
+                this.resolvedEndInfo = true;
             }
 
             if(msg.type === "start_room"){
