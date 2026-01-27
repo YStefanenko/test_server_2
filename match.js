@@ -193,7 +193,8 @@ export class Match {
                 players: this.players,
                 winner: winner,
                 condition: condition,
-                end_info: this.endInfo
+                end_info: this.endInfo,
+                elo: true
             }
         });
 

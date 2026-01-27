@@ -303,7 +303,8 @@ export class Custom_Match {
                 players: this.players,
                 winner: winner,
                 condition: condition,
-                end_info: this.endInfo
+                end_info: this.endInfo,
+                elo: false
             }
         });
 
