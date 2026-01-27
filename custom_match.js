@@ -110,7 +110,7 @@ export class Custom_Match {
         else if(this.mode === "v3") minPlayers = 3;
         else if(this.mode === "v4") minPlayers = 4;
 
-        this.spectators = this.players.splice(minPlayers);
+        this.spectators = this.players.splice(minPlayers-1);
 
         this.startPlayers = this.players;
 
@@ -250,6 +250,7 @@ export class Custom_Match {
 
     async end(condition, winner = null) {
         if (!this.running) return;
+        this.running = false;
 
         if(condition === "error"){
             for (const p of this.players) {
@@ -270,8 +271,6 @@ export class Custom_Match {
             activeMatches.delete(this.id);
             return;
         }
-
-        this.running = false;
 
         clearInterval(this.interval);
 
@@ -332,14 +331,16 @@ export class Custom_Match {
         if(this.running && msg.type != "start_room"){
             this.messages.push(msg)
         }
-        if(msg.type === "stats" && !this.resolvedEndInfo){
-            this.endInfo = msg;
+        else{
+            if(msg.type === "stats"){
+                this.endInfo = msg;
 
-            this.resolvedEndInfo = true;
-        }
+                this.resolvedEndInfo = true;
+            }
 
-        if(msg.type === "start_room"){
-            this.matchStartInfo = msg;
+            if(msg.type === "start_room"){
+                this.matchStartInfo = msg;
+            }
         }
     }
 }
