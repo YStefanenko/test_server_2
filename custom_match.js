@@ -330,16 +330,14 @@ export class Custom_Match {
         if(this.running && msg.type != "start_room"){
             this.messages.push(msg)
         }
-        else{
-            if(msg.type === "end_info" && !this.resolvedEndInfo){
-                this.endInfo = msg;
+        if(msg.type === "end_info" && !this.resolvedEndInfo){
+            this.endInfo = msg;
 
-                this.resolvedEndInfo = true;
-            }
+            this.resolvedEndInfo = true;
+        }
 
-            if(msg.type === "start_room"){
-                this.matchStartInfo = msg;
-            }
+        if(msg.type === "start_room"){
+            this.matchStartInfo = msg;
         }
     }
 }
