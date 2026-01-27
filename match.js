@@ -7,6 +7,7 @@ export class Match {
         this.id = id;
         this.mode = mode;
         this.players = players;
+        this.startPlayers = players;
         this.activePlayers = new Map();
         this.running = false;
         this.tickRate = 997;
@@ -190,10 +191,11 @@ export class Match {
         await sendToCentral({
             type: `score_game`,
             content:{
-                players: this.players,
+                players: this.startPlayers,
                 winner: winner,
                 condition: condition,
                 end_info: this.endInfo,
+                mode: this.mode,
                 elo: true
             }
         });

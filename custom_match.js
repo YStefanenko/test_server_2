@@ -7,6 +7,7 @@ export class Custom_Match {
         this.id = id;
         this.mode = mode;
         this.players = players;
+        this.startPlayers = null;
         this.spectators = [];
         this.activePlayers = new Map();
         this.running = false;
@@ -113,6 +114,8 @@ export class Custom_Match {
         else if(this.mode === "v4") minPlayers = 4;
 
         this.spectators = this.players.splice(minPlayers);
+
+        this.startPlayers = this.players;
 
         const playerNameList = [];
         for (const p of this.players) {
@@ -300,10 +303,11 @@ export class Custom_Match {
         await sendToCentral({
             type: `score_game`,
             content:{
-                players: this.players,
+                players: this.startPlayers,
                 winner: winner,
                 condition: condition,
                 end_info: this.endInfo,
+                mode:  this.mode,
                 elo: false
             }
         });
