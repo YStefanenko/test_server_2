@@ -148,7 +148,7 @@ export class Custom_Match {
         }
 
         for (const p of this.spectators) {
-            await sendToPlayer(p.ws, { type: "match_start", content: {map: String(mapNum), players: playerNameList }});
+            await sendToPlayer(p.ws, { type: "match_start", content: {color: i, map: String(mapNum), players: playerNameList }});
         }
     }
 
