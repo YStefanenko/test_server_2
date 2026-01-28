@@ -106,10 +106,6 @@ app.get('/', (req, res) => {
           <p id="connectedPlayers" class="text-4xl font-bold text-yellow-400">–</p>
         </div>
       </div>
-
-      <p class="text-center text-yellow-400/50 text-xs mt-8">
-        Auto-refreshes every 5 seconds
-      </p>
     </div>
   </div>
 
