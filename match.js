@@ -1,4 +1,4 @@
-import { activeMatches, CONNECTED_IPS } from "./globalVariables.js";
+import { activeMatches, CONNECTED_IPS, loadRounds, saveRounds } from "./globalVariables.js";
 import { sendToCentral } from "./server.js";
 
 export class Match {
@@ -160,7 +160,9 @@ export class Match {
     }
 
     async end(condition, winner = null) {
-        if (!this.running) return;
+        let roundsPlayed = loadRounds();
+        roundsPlayed++;
+        saveRounds(roundsPlayed);
 
         if(condition === "error"){
             for (const p of this.players) {
@@ -170,6 +172,8 @@ export class Match {
             activeMatches.delete(this.id);
             return;
         }
+        
+        if (!this.running) return;
 
         this.running = false;
 

@@ -1,4 +1,4 @@
-import { activeCustomMatches, CONNECTED_IPS } from "./globalVariables.js";
+import { activeCustomMatches, CONNECTED_IPS, loadRounds, saveRounds } from "./globalVariables.js";
 import { sendToCentral } from "./server.js";
 
 export class Custom_Match {
@@ -267,6 +267,10 @@ export class Custom_Match {
     }
 
     async end(condition, winner = null) {
+        let roundsPlayed = loadRounds();
+        roundsPlayed++;
+        saveRounds(roundsPlayed);
+
         if(condition === "error"){
             sendToCentral({
             type: `close_custom_room`,

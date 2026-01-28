@@ -1,7 +1,7 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { activeCustomMatches, activeMatches, CONNECTED_IPS } from './globalVariables.js';
+import { activeCustomMatches, activeMatches, CONNECTED_IPS, loadRounds } from './globalVariables.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -57,13 +57,15 @@ app.get('/api/stats', authenticate, (req, res) => {
   try {
     const matches = getOngoingMatchStats();
     const players = getConnectedPlayers();
+    const roundsPlayed = loadRounds();
 
     res.json({
       ongoingMatches: {
         normal: matches.normal,
         custom: matches.custom
       },
-      connectedPlayers: players
+      connectedPlayers: players,
+      roundsPlayed: roundsPlayed
     });
   } catch (err) {
     console.error('Stats error:', err);
@@ -105,6 +107,11 @@ app.get('/', (req, res) => {
           <p class="text-sm text-yellow-400/70 mb-2">Connected Players</p>
           <p id="connectedPlayers" class="text-4xl font-bold text-yellow-400">–</p>
         </div>
+
+        <div class="bg-[#2a2a2a] p-6 rounded-xl border border-yellow-600/10">
+          <p class="text-sm text-yellow-400/70 mb-2">Total Rounds Played</p>
+          <p id="roundsPlayed" class="text-4xl font-bold text-yellow-400">–</p>
+        </div>
       </div>
     </div>
   </div>
@@ -130,6 +137,7 @@ app.get('/', (req, res) => {
       document.getElementById('normalMatches').textContent = data.ongoingMatches.normal;
       document.getElementById('customMatches').textContent = data.ongoingMatches.custom;
       document.getElementById('connectedPlayers').textContent = data.connectedPlayers;
+      document.getElementById('roundsPlayed').textContent = data.roundsPlayed;
 
     } catch (err) {
       console.error('Failed to fetch stats', err);
