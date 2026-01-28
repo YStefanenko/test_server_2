@@ -75,7 +75,6 @@ export class Custom_Match {
             }
         }
 
-        console.log(this.players.length);
         if(this.players.length === 0 || this.players === null){
             this.end(`error`);
         }
@@ -268,9 +267,6 @@ export class Custom_Match {
     }
 
     async end(condition, winner = null) {
-        if (!this.running) return;
-        this.running = false;
-
         if(condition === "error"){
             sendToCentral({
             type: `close_custom_room`,
@@ -290,6 +286,8 @@ export class Custom_Match {
             }
             return;
         }
+        if (!this.running) return;
+        this.running = false;
 
         clearInterval(this.interval);
 
