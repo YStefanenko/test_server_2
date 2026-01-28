@@ -1,10 +1,8 @@
 import { Match } from "./match.js";
 import { Custom_Match } from "./custom_match.js";
-import { CONNECTED_IPS } from "./globalVariables.js";
+import { CONNECTED_IPS, activeMatches, activeCustomMatches } from "./globalVariables.js";
 import { sendToCentral } from "./server.js";
-import { activeCustomMatches } from "./globalVariables.js";
 
-export const activeMatches = new Map();
 
 let matchIdCounter = 1;
 

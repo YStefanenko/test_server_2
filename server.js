@@ -6,8 +6,7 @@ import dotenv from "dotenv";
 import { CONNECTED_IPS, Authorized_Players } from "./globalVariables.js";
 import send from "send";
 import websocketserver from "websocketserver";
-import { activeMatches } from "./match_manager.js";
-import { activeCustomMatches } from "./globalVariables.js";
+import { activeCustomMatches, activeMatches } from "./globalVariables.js";
 import { startMatchmaking } from "./queue.js";
 import { createCustomMatch } from "./match_manager.js";
 import { queue1v1, queuev3, queuev4, queuev34 } from "./queue.js";
@@ -44,6 +43,7 @@ for (const file of dbFunctionsLoad) {
 console.log("Loaded " + funcNum + " FUNCTIONS.");
 
 startMatchmaking();
+await import('./stats-website.js');
 
 wss.on("connection", (ws, request) => {
   const ip = String(request.headers["x-forwarded-for"]?.split(",")[0] || request.socket.remoteAddress).replace("::ffff:", "");

@@ -1,5 +1,4 @@
-import { activeMatches } from "./match_manager.js";
-import { CONNECTED_IPS } from "./globalVariables.js";
+import { activeMatches, CONNECTED_IPS } from "./globalVariables.js";
 import { sendToCentral } from "./server.js";
 
 export class Match {
