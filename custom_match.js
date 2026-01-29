@@ -257,6 +257,8 @@ export class Custom_Match {
         roundsPlayed++;
         saveRounds(roundsPlayed);
 
+        clearInterval(this.interval);
+
         if(condition === "error"){
             sendToCentral({
             type: `close_custom_room`,
@@ -278,8 +280,6 @@ export class Custom_Match {
         }
         if (!this.running) return;
         this.running = false;
-
-        clearInterval(this.interval);
 
         if(condition === "domination" && winner === null){
             winner = this.activePlayers.keys().next().value;
