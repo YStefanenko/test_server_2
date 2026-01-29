@@ -33,7 +33,7 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 // This is 1v1 matchmaking
 export async function matchmaking1v1() {
-    console.log("Matchmaking 1v1 running");
+    console.log("[MATCHMAKING] Matchmaking 1v1 running");
 
     while (true) {
         let players = [];
@@ -47,7 +47,7 @@ export async function matchmaking1v1() {
                 for (let i = players.length - 1; i >= 0; i--) {
                     // Check if the player is connected (if you already have a funciton like that)
                     if (players[i].ws.readyState != 1) {
-                        console.log(`${players[i].username} Removed from 1v1 Queue.`);
+                        console.log(`[MATCHMAKING] ${players[i].username} Removed from 1v1 Queue.`);
                         players.splice(i, 1);
                     }
                 }
@@ -75,7 +75,7 @@ export async function matchmaking1v1() {
 
 // Matchmaking 3p, 4p, 3 or 4 p
 export async function matchmakingV34() {
-    console.log("Matchmaking v34 running");
+    console.log("[MATCHMAKING] Matchmaking v34 running");
 
     let playersV3 = [];
     let playersV4 = [];
@@ -93,7 +93,7 @@ export async function matchmakingV34() {
             } catch (err) {
                 for (let i = playersV3.length - 1; i >= 0; i--) {
                     if (playersV3[i].ws.readyState != 1) {
-                        console.log(`${playersV3[i].username} Removed from v3 Queue.`);
+                        console.log(`[MATCHMAKING] ${playersV3[i].username} Removed from v3 Queue.`);
                         playersV3.splice(i, 1);
                     }
                 }
@@ -107,7 +107,7 @@ export async function matchmakingV34() {
             } catch (err) {
                 for (let i = playersV4.length - 1; i >= 0; i--) {
                     if (playersV4[i].ws.readyState != 1) {
-                        console.log(`${playersV4[i].username} Removed from v4 Queue.`);
+                        console.log(`[MATCHMAKING] ${playersV4[i].username} Removed from v4 Queue.`);
                         playersV4.splice(i, 1);
                     }
                 }
@@ -121,7 +121,7 @@ export async function matchmakingV34() {
             } catch (err) {
                 for (let i = playersV34.length - 1; i >= 0; i--) {
                     if (playersV34[i].ws.readyState != 1) {
-                        console.log(`${playersV34[i].username} Removed from v34 Queue.`);
+                        console.log(`[MATCHMAKING] ${playersV34[i].username} Removed from v34 Queue.`);
                         playersV34.splice(i, 1);
                     }
                 }
